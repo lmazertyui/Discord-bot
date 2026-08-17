@@ -55,7 +55,7 @@ async def creer_structure_serveur(guild: discord.Guild):
     everyone_role = guild.default_role
 
     for nom_categorie, infos in STRUCTURE.items():
-        overwrites = None
+        overwrites = {}
         if infos["private_staff"]:
             # catégorie STAFF : invisible pour @everyone
             overwrites = {
