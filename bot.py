@@ -42,7 +42,7 @@ async def upload(
     image: discord.Attachment = None,
 ):
     # Double vérification : seuls les administrateurs peuvent utiliser cette commande
-    if not interaction.user.guild_permissions.administrator:
+    if not interaction.permissions.administrator:
         await interaction.response.send_message(
             "⛔ Seuls les administrateurs du serveur peuvent utiliser cette commande.",
             ephemeral=True,
