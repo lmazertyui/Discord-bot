@@ -9,6 +9,7 @@ from discord.ext import commands
 TOKEN = os.getenv("DISCORD_TOKEN")  # Mets ton token dans une variable d'environnement sur Railway
 
 intents = discord.Intents.default()
+intents.members = True  # Nécessaire pour que le bot voie correctement les rôles et permissions des membres
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -74,6 +75,23 @@ async def upload(
         embed.set_image(url=image_url)
 
     await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(name="debugperms", description="Debug: affiche tes permissions telles que le bot les voit.")
+async def debugperms(interaction: discord.Interaction):
+    if interaction.guild is None:
+        await interaction.response.send_message("Cette commande doit être utilisée dans un serveur.", ephemeral=True)
+        return
+
+    member = interaction.user
+    lines = [
+        f"Utilisateur : {member} (ID: {member.id})",
+        f"Rôles : {', '.join(r.name for r in member.roles)}",
+        f"guild_permissions.administrator : {member.guild_permissions.administrator}",
+        f"Est propriétaire du serveur : {interaction.guild.owner_id == member.id}",
+        f"interaction.permissions.administrator (contexte salon) : {interaction.permissions.administrator}",
+    ]
+    await interaction.response.send_message("```\n" + "\n".join(lines) + "\n```", ephemeral=True)
 
 
 bot.run(TOKEN)
