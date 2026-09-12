@@ -32,6 +32,8 @@ async def on_ready():
     loadstring="The script loadstring to showcase.",
     image_url="Optional: a direct link to an image.",
     image="Optional: an image uploaded from your gallery/files.",
+    video_url="Optional: a direct link to a video.",
+    video="Optional: a video uploaded from your gallery/files.",
 )
 @app_commands.default_permissions(administrator=True)
 async def upload(
@@ -40,6 +42,8 @@ async def upload(
     loadstring: str,
     image_url: str = None,
     image: discord.Attachment = None,
+    video_url: str = None,
+    video: discord.Attachment = None,
 ):
     # Double vérification : seuls les administrateurs peuvent utiliser cette commande
     if not interaction.permissions.administrator:
@@ -74,7 +78,23 @@ async def upload(
     elif image_url:
         embed.set_image(url=image_url)
 
+    # Vérification du fichier vidéo si fourni depuis la galerie
+    if video is not None:
+        if not video.content_type or not video.content_type.startswith("video/"):
+            await interaction.response.send_message(
+                "⚠️ Le fichier fourni dans `video` n'est pas une vidéo valide.",
+                ephemeral=True,
+            )
+            return
+
     await interaction.response.send_message(embed=embed)
+
+    # Discord n'affiche pas les vidéos dans les embeds, donc on l'envoie en message séparé
+    if video is not None:
+        video_file = await video.to_file()
+        await interaction.followup.send(file=video_file)
+    elif video_url:
+        await interaction.followup.send(video_url)
 
 
 @bot.tree.command(name="debugperms", description="Debug: affiche tes permissions telles que le bot les voit.")
