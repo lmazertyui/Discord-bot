@@ -53,12 +53,12 @@ async def upload(
         )
         return
 
-    # On protège le code contre les backticks qui casseraient le code inline
-    safe_loadstring = loadstring.replace("`", "'")
+    # On protège le code contre les balises Discord qui casseraient le bloc de code
+    safe_loadstring = loadstring.replace("```", "``\u200b`")
 
     embed = discord.Embed(
         title=title,
-        description=f"`{safe_loadstring}`",
+        description=f"```lua\n{safe_loadstring}\n```",
         color=discord.Color.blurple(),
     )
     embed.set_footer(
